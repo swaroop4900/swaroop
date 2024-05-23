@@ -1,0 +1,29 @@
+---
+- name: Gather user accounts with UID greater than 999
+  hosts: all
+  become: yes
+  vars:
+    system_uid_max: 999
+    ignored_users: ['md', 'cl']
+    users_to_delete: []
+
+  tasks:
+    - name: Get users with UID greater than 999
+      shell: "awk -F: '($3 > {{ system_uid_max }}) {print $1}' /etc/passwd"
+      changed_when: false
+      register: users_with_high_uid
+
+    - name: Filter out ignored users
+      set_fact:
+        users_to_delete: "{{ users_with_high_uid.stdout_lines | difference(ignored_users) }}"
+
+    - name: Show users to delete
+      debug:
+        var: users_to_delete
+
+    - name: Delete users with high UID
+      user:
+        name: "{{ item }}"
+        state: absent
+      with_items: "{{ users_to_delete }}"
+      ignore_errors: yes
