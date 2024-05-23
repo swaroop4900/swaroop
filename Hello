@@ -27,3 +27,39 @@
         state: absent
       with_items: "{{ users_to_delete }}"
       ignore_errors: yes
+
+
+
+
+---
+- name: Check and modify UID of cbflow and mgmtbld users if they exist
+  hosts: all
+  become: yes
+  vars:
+    cbflow_uid: 766
+    mgmtbld_uid: 767
+
+  tasks:
+    - name: Check if cbflow user exists
+      command: getent passwd cbflow
+      register: cbflow_user
+      ignore_errors: yes
+
+    - name: Change UID of cbflow if it exists
+      user:
+        name: cbflo
+        uid: "{{ cow_uid }}"
+        state: present
+      when: cbflow_user.rc == 0
+
+    - name: Check if mgmtbld user exists
+      command: getent passwd mgmd
+      register: mtbld_user
+      ignore_errors: yes
+
+    - name: Change UID of mgmtbld if it exists
+      user:
+        name: mgmtbld
+        uid: "{{ mgld_uid }}"
+        state: present
+      when: mgmtbld_user.rc == 0
