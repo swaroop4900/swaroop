@@ -29,6 +29,32 @@
       ignore_errors: yes
 
 
+- name: Pause processes, change UID, and resume processes for mgmtbld
+  hosts: all
+  become: yes
+  tasks:
+    - name: List running processes for mgmtbld
+      shell: pgrep -u mgmtbld
+      register: mgmtbld_processes
+      failed_when: mgmtbld_processes.rc not in [0, 1]
+      changed_when: false
+
+    - name: Pause running processes for mgmtbld
+      shell: kill -SIGSTOP {{ item }}
+      with_items: "{{ mgmtbld_processes.stdout_lines }}"
+      when: mgmtbld_processes.rc == 0
+
+    - name: Change UID of mgmtbld
+      user:
+        name: mgmtbld
+        uid: 1234  # Desired UID
+
+    - name: Resume paused processes for mgmtbld
+      shell: kill -SIGCONT {{ item }}
+      with_items: "{{ mgmtbld_processes.stdout_lines }}"
+      when: mgmtbld_processes.rc == 0
+
+
 
 
 ---
