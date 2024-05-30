@@ -63,3 +63,27 @@
         uid: "{{ mgld_uid }}"
         state: present
       when: mgmtbld_user.rc == 0
+
+
+- name: Ensure no processes are running under mgmtbld before changing UID
+  hosts: all
+  become: yes
+  tasks:
+    - name: Check for running processes for mgmtbld
+      shell: pgrep -u mgmtbld
+      register: mgmtbld_processes
+      failed_when: mgmtbld_processes.rc not in [0, 1]
+      changed_when: false
+
+    - name: Wait for mgmtbld processes to complete
+      wait_for:
+        timeout: 3600  # Adjust the timeout as needed
+        state: absent
+        path: /proc/{{ item }}
+      with_items: "{{ mgmtbld_processes.stdout_lines }}"
+      when: mgmtbld_processes.rc == 0
+
+    - name: Change UID of mgmtbld
+      user:
+        name: mgmtbld
+        uid: 1234  # Desired UID
