@@ -52,3 +52,41 @@
           kill -CONT $pid
         done
       when: mgmtbld_processes.rc == 0
+
+
+
+
+- name: Pause processes, change UID, and resume processes for mgmtbld
+  hosts: all
+  become: yes
+  tasks:
+    - name: List running processes for mgmtbld
+      shell: pgrep -u mgmtbld
+      register: mgmtbld_processes
+      failed_when: mgmtbld_processes.rc not in [0, 1]
+      changed_when: false
+
+    - name: Pause running processes for mgmtbld
+      shell: |
+        paused_pids=""
+        for pid in {{ mgmtbld_processes.stdout_lines | join(' ') }}; do
+          if timeout 5s kill -STOP $pid; then
+            paused_pids+="$pid "
+          fi
+        done
+        echo $paused_pids
+      register: paused_processes
+      when: mgmtbld_processes.rc == 0
+
+    - name: Change UID of mgmtbld
+      user:
+        name: mgmtbld
+        uid: 1234  # Desired UID
+      when: paused_processes.stdout != ""
+
+    - name: Resume paused processes for mgmtbld
+      shell: |
+        for pid in {{ paused_processes.stdout | trim | split(' ') }}; do
+          kill -CONT $pid
+        done
+      when: paused_processes.stdout != ""
