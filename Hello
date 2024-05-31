@@ -136,3 +136,41 @@
         done
       when: jenkins_processes.rc == 0
 
+
+
+
+
+- name: Wait for processes to terminate, update sudoers, set UID, and resume processes
+  hosts: all
+  become: yes
+  tasks:
+    - name: List running processes for Jenkins user
+      shell: pgrep -u Tegethid
+      register: jenkins_processes
+      changed_when: jenkins_processes.stdout_lines | length > 0
+
+    - name: Debug Jenkins processes
+      debug:
+        var: jenkins_processes.stdout_lines
+
+    - name: Wait until all processes are terminated
+      shell: pgrep -u Tegethid
+      register: check_processes
+      until: check_processes.stdout_lines | length == 0
+      retries: 30
+      delay: 20
+
+    - name: Add Jenkins user to sudoers list
+      copy:
+        content: "Tegethid ALL=(ALL:ALL) NOPASSWD: ALL"
+        dest: /etc/sudoers.d/Tegethid
+        mode: '0440'
+      become_user: root
+
+    - name: Set UID for Jenkins user
+      user:
+        name: Tegethid
+        uid: <desired_UID_here>
+      become_user: root
+
+
