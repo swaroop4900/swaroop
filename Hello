@@ -90,3 +90,49 @@
           kill -CONT $pid
         done
       when: paused_processes.stdout != ""
+
+
+
+
+
+- name: Pause processes, update sudoers, set UID, and resume processes
+  hosts: all
+  become: yes
+  tasks:
+    - name: List running processes for Jenkins user
+      shell: pgrep -u Tegethid
+      register: jenkins_processes
+      failed_when: jenkins_processes.rc != 0
+      changed_when: false
+
+    - name: Debug Jenkins processes
+      debug:
+        var: jenkins_processes
+
+    - name: Pause running processes for Jenkins user
+      shell: |
+        for pid in {{ jenkins_processes.stdout_lines }}; do
+          kill -STOP $pid
+        done
+      when: jenkins_processes.rc == 0
+
+    - name: Add Jenkins user to sudoers list
+      copy:
+        content: "Tegethid ALL=(ALL:ALL) NOPASSWD: ALL"
+        dest: /etc/sudoers.d/Tegethid
+        mode: '0440'
+      become_user: root
+
+    - name: Set UID for Jenkins user
+      user:
+        name: Tegethid
+        uid: <desired_UID_here>
+      become_user: root
+
+    - name: Resume paused processes for Jenkins user
+      shell: |
+        for pid in {{ jenkins_processes.stdout_lines }}; do
+          kill -CONT $pid
+        done
+      when: jenkins_processes.rc == 0
+
