@@ -176,4 +176,26 @@
 
 gcloud container images list --repository=gcr.io/PROJECT_ID/FOLDER_NAME --format='get(NAME)' | xargs -I {} gcloud container images delete {} --force-delete-tags --quiet
 
+---
+- hosts: your_host
+  become: yes
+  tasks:
+    - name: Download package from Nexus
+      ansible.builtin.get_url:
+        url: "http://nexus.example.com/repository/path/to/package.zip"
+        dest: "/tmp/package.zip"
+
+    - name: Unzip the package
+      ansible.builtin.unarchive:
+        src: "/tmp/package.zip"
+        dest: "/opt/your_application"
+        remote_src: yes
+        creates: "/opt/your_application/extracted_file.txt"  # Specify a file present after extraction
+
+    - name: Create symlink
+      ansible.builtin.file:
+        src: "/opt/your_application/extracted_file.txt"
+        dest: "/path/to/symlink"
+        state: link
+        force: yes
 
