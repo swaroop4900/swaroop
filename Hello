@@ -174,3 +174,6 @@
       become_user: root
 
 
+gcloud container images list --repository=gcr.io/PROJECT_ID/FOLDER_NAME --format='get(NAME)' | xargs -I {} gcloud container images delete {} --force-delete-tags --quiet
+
+
