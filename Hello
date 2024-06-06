@@ -198,4 +198,10 @@ gcloud container images list --repository=gcr.io/PROJECT_ID/FOLDER_NAME --format
         dest: "/path/to/symlink"
         state: link
         force: yes
+Hi everyone,
 
+A few days ago, I asked for help with promoting GCP images according to GCP standards. We are trying to change the UID of the users that we have been creating at the end of the locked image. The images are promoting properly, except for the `mgmtbld` and `sql proxy` images.
+
+While trying to update the UID of the users for these images, it fails due to processes running in the backend. I have tried different approaches, but nothing is working out. Can anyone suggest better approaches?
+
+Thank you.
