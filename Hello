@@ -1,6 +1,6 @@
 - name: Pause processes, change UID, and resume processes for mgmtbld
   hosts: all
-  become: yes
+  become: no
   tasks:
     - name: List running processes for mgmtbld
       shell: pgrep -u mgmtbld
