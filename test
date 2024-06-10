@@ -2,3 +2,26 @@ dadada
 dsada
 dada
 gfgg
+We have images that need to be promoted from dev to prod. We faced image promotion issues a few weeks back. As per the suggestion from your team, we updated our Packer and removed unwanted users. If we determine that a user is needed, we are changing the UID of the user, and images are now promoting successfully.
+
+However, we are currently facing issues with one of our images. The specific issues we are encountering are related to the promotion of the image. When we updated Packer, we tried to change the UID of an existing user at the end of the Ansible playbook, but it failed with the error that processes are running in the backend and the UID can't be updated.
+
+We then attempted to change the UID at the initial stage of the Ansible playbook. This resulted in an error with messages like the following:
+
+bash
+Copy code
+fatal: [default]: UNREACHABLE! (changed": false, "msg": "Authentication or permission failure. In some cases, you may have been able to authenticate but did not have permissions on the target directory. Consider changing the remote tmp path in ansible.cfg to a path rooted in \"/tmp\". Failed command was: umask 77 & mkdir -p echo /home/mgmtbld/ansible/tmp/ansible-tmp-1718003469.6599243-190575082166341 && echo ansible-tmp-1718003469.6599243-190575082166341= echo /home/mgmtbld/ansible/tmp/ansible-tmp-1718003469.6599243-190575082166341) exited with result 1", "unreachable": true)
+We are seeking assistance to resolve this issue.
+
+Feel free to adjust any details to better fit your specific situation.
+
+
+
+
+
+
+
+
+
+
+ChatGPT can
