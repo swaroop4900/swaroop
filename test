@@ -1,15 +1,35 @@
-dadada
-dsada
-dada
-,
-Sure! Here is the revised version of your message:
-
 ---
+- name: Create user and set up home directory with permissions
+  hosts: all
+  become: yes
 
-Hi,
+  tasks:
+    - name: Ensure the user 'mgmtbld' is present with UID 777
+      user:
+        name: mgmtbld
+        uid: 777
+        home: /home/mgmtbld
+        create_home: yes
+        shell: /bin/bash
 
-We have received an HGMS for the following project: 7272727. To address this violation, we need access to the project and the associated SOT files. Currently, no one has access, so we have raised a ServiceNow request, which is waiting for second-level approval.
+    - name: Ensure the home directory exists
+      file:
+        path: /home/mgmtbld
+        state: directory
+        owner: mgmtbld
+        group: mgmtbld
+        mode: '0777'
 
----
+    - name: Set permissions to allow everyone to upload and change files
+      acl:
+        path: /home/mgmtbld
+        recurse: yes
+        entry: 'u::rwx,g::rwx,o::rwx'
+        state: present
 
-Is there anything else you would like to add or modify?
+    - name: Set default ACL for new files and directories
+      acl:
+        path: /home/mgmtbld
+        recurse: yes
+        entry: 'd:u::rwx,d:g::rwx,d:o::rwx'
+        state: present
