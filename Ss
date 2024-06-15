@@ -1,0 +1,21 @@
+Sure, here’s a clearer and more grammatically correct version of your message:
+
+---
+
+Hi Team,
+
+We have been facing an issue with the image creation process.
+
+We have around seven images, most of which are being promoted to production. As per the suggestion, we are removing or updating the UID of users during the image creation process.
+
+However, we are unable to create one of our images because updating the UID is throwing an error: "PID is running; we can't update UID."
+
+We have been using the following Ansible Galaxy role during the image creation process as suggested in the GCP Confluence page: [GCP Lockdown & Compliance](https://alm-confluence).
+
+
+
+The problem is that while using this Ansible Galaxy role, the process gets stuck for a long time without giving any result. Please find the attachment for more details.
+
+---
+
+Let me know if you need any more adjustments.
