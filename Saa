@@ -1,0 +1,12 @@
+---
+- name: List users and their UIDs
+  hosts: all
+  tasks:
+    - name: Get user list with UIDs
+      command: getent passwd
+      register: passwd_output
+
+    - name: Display users with UIDs
+      debug:
+        msg: "User: {{ item.split(':')[0] }}, UID: {{ item.split(':')[2] }}"
+      loop: "{{ passwd_output.stdout_lines }}"
