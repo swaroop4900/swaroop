@@ -10,3 +10,35 @@
       debug:
         msg: "User: {{ item.split(':')[0] }}, UID: {{ item.split(':')[2] }}"
       loop: "{{ passwd_output.stdout_lines }}"
+
+
+
+
+---
+- name: Ensure mgmtbld user exists with specific UID and home directory
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure /home/mgmtbld directory exists
+      file:
+        path: /home/mgmtbld
+        state: directory
+        owner: mgmtbld
+        group: mgmtbld
+        mode: '0755'
+
+    - name: Create mgmtbld user with specific UID and home directory
+      user:
+        name: mgmtbld
+        uid: 777
+        home: /home/mgmtbld
+        shell: /bin/bash
+        create_home: no  # We ensure the home directory exists manually
+
+    - name: Set ownership of the home directory to mgmtbld
+      file:
+        path: /home/mgmtbld
+        state: directory
+        owner: mgmtbld
+        group: mgmtbld
+        mode: '0755'
