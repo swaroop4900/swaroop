@@ -22,10 +22,53 @@
     - name: Set permissions of all files and directories inside /home/mgmtbld/tmp to 777
       find:
         paths: /home/mgmtbld/tmp
-      register: files_and_directories
+      register: files_and_directories 11
 
     - name: Change permissions to 777
       file:
         path: "{{ item.path }}"
         mode: '0777'
       loop: "{{ files_and_directories.files }}"
+
+---
+- name: List files in /home/mgmtbld/ansible/tmp with ls -ltr and display their contents
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure /home/mgmtbld/ansible/tmp directory exists
+      file:
+        path: /home/mgmtbld/ansible/tmp
+        state: directory
+
+    - name: List files in /home/mgmtbld/ansible/tmp
+      command: ls -ltr /home/mgmtbld/ansible/tmp
+      register: ls_output
+
+    - name: Display the output of ls -ltr
+      debug:
+        msg: "{{ ls_output.stdout }}"
+
+    - name: Find all files and directories inside /home/mgmtbld/ansible/tmp
+      find:
+        paths: /home/mgmtbld/ansible/tmp
+      register: files_and_directories
+
+    - name: Display file contents if it is a file
+      block:
+        - name: Read file content
+          slurp:
+            path: "{{ item.path }}"
+          register: file_content
+          when: item.state == 'file'
+          loop: "{{ files_and_directories.files }}"
+
+        - name: Decode and display file content
+          debug:
+            msg: |
+              Path: {{ item.path }}
+              Content: |
+              {{ file_content['content'] | b64decode }}
+          when: item.state == 'file'
+          loop: "{{ files_and_directories.files }}"
+          loop_control:
+            label: "{{ item.path }}"
