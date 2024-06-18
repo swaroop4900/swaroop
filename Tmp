@@ -1,0 +1,17 @@
+Subject: Assistance Required with GCP Image Creation Process
+
+Hi Team,
+
+We have successfully refreshed all instances except for the management and SQL proxy. However, we are currently facing an issue with the image creation process due to recent changes in GCP standards. One of these changes requires that we only have system users while creating a GCP image, and the user's UID must be less than 999 to promote images.
+
+To comply with this requirement, we have been updating the UID of users at the end of the image creation process. Unfortunately, this process is failing for the management and SQL proxy images due to running processes in the backend, which prevents us from updating the UID. We have attempted various methods, such as stopping the PIDs, but nothing has worked so far.
+
+We recently connected with the Jenkins team, who are using a similar approach, and they suggested using the following Ansible configuration during the image creation process:
+
+
+Initially, we encountered different errors with Ansible Galaxy because we were using Python 3.6, which is not supported by Ansible Galaxy. After upgrading to Python 3.8, Ansible Galaxy started working. However, we are still facing similar issues. While running Ansible Galaxy, we received an error indicating that the user mgmtbld is currently used by a running process (PID 2088), preventing the deletion of the user.
+
+We reached out to the GCP team, who suggested adding the `use_os_login=true` attribute in the image creation process (Packer file). However, adding this attribute results in the following error, which we are unable to resolve:
+
+
+We need assistance in resolving this issue as it is impacting our image creation process. Any guidance or solutions from your end would be greatly appreciated.
