@@ -1,0 +1,24 @@
+- name: Troubleshoot directory creation issue
+  hosts: all
+  tasks:
+    - name: Verify directory permissions
+      ansible.builtin.command:
+        cmd: ls -ld /home/mgmtbld/.ansible/tmp
+      register: dir_permissions
+
+    - name: Display directory permissions
+      ansible.builtin.debug:
+        msg: "{{ dir_permissions.stdout }}"
+
+    - name: Ensure the .ansible/tmp directory exists
+      ansible.builtin.file:
+        path: /home/mgmtbld/.ansible/tmp
+        state: directory
+        owner: mgmtbld
+        mode: '0755'
+
+    - name: Set write permissions for mgmtbld user on /home/mgmtbld/.ansible/tmp
+      ansible.builtin.file:
+        path: /home/mgmtbld/.ansible/tmp
+        owner: mgmtbld
+        mode: '0755'
