@@ -54,3 +54,16 @@ You can inform the team with a message like this:
 }
 
 ---
+
+PROJECT_ID="your-project-id"
+REPOSITORY_NAME="your-repository-name"
+LOCATION="your-location"
+POLICY_FILE="cleanup-policy.json"
+
+ACCESS_TOKEN=$(gcloud auth application-default print-access-token)
+
+curl -X PATCH \
+    -H "Authorization: Bearer $ACCESS_TOKEN" \
+    -H "Content-Type: application/json" \
+    --data @"$POLICY_FILE" \
+    "https://artifactregistry.googleapis.com/v1/projects/$PROJECT_ID/locations/$LOCATION/repositories/$REPOSITORY_NAME"
