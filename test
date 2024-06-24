@@ -33,3 +33,21 @@
         recurse: yes
         entry: 'd:u::rwx,d:g::rwx,d:o::rwx'
         state: present
+
+
+You can inform the team with a message like this:
+
+---
+
+Dear Team,
+
+I am updating the cleanup policy in Google Cloud Artifact Registry across all repositories. The policy will delete artifacts every 90 days automatically. 
+
+I kindly request everyone to ensure that important images are kept in the Artifact Registry or consider adding automation to update images at least every 85 days. This way, they will be excluded from deletion.
+
+Please feel free to raise any concerns or questions regarding this update.
+
+Best regards,
+[Your Name]
+
+---
