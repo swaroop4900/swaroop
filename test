@@ -67,3 +67,48 @@ curl -X PATCH \
     -H "Content-Type: application/json" \
     --data @"$POLICY_FILE" \
     "https://artifactregistry.googleapis.com/v1/projects/$PROJECT_ID/locations/$LOCATION/repositories/$REPOSITORY_NAME"
+
+---
+- name: Manage user mgmtbld
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure the group mgmtbld exists
+      ansible.builtin.group:
+        name: mgmtbld
+        gid: 766
+        state: present
+
+    - name: Create user mgmtbld with UID 766
+      ansible.builtin.user:
+        name: mgmtbld
+        uid: 766
+        group: mgmtbld
+        home: /home/mgmtbld
+        shell: /bin/bash
+        state: present
+
+    - name: Add user mgmtbld to the mgmtbld group
+      ansible.builtin.user:
+        name: mgmtbld
+        groups: mgmtbld
+        append: yes
+
+    - name: Check if user mgmtbld exists
+      ansible.builtin.getent:
+        database: passwd
+        key: mgmtbld
+      register: user_exists
+
+    - name: Display user mgmtbld existence
+      debug:
+        msg: "User mgmtbld exists"
+      when: user_exists is defined
+
+    - name: Check users under /home
+      command: ls /home
+      register: home_users
+
+    - name: Display users under /home
+      debug:
+        var: home_users.stdout_lines
