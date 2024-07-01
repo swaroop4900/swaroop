@@ -1,0 +1,26 @@
+---
+- name: Create user and set permissions
+  hosts: all
+  become: yes
+  tasks:
+    - name: Create user with specific UID and home directory
+      user:
+        name: mgmtbld
+        uid: 677
+        home: /home/mgmtbld
+        createhome: yes
+
+    - name: Set permissions for the home directory
+      file:
+        path: /home/mgmtbld
+        owner: mgmtbld
+        group: mgmtbld
+        mode: '0777'
+    
+    - name: Set group permissions to 777
+      acl:
+        path: /home/mgmtbld
+        entity: mgmtbld
+        etype: group
+        perms: rwx
+        state: present
