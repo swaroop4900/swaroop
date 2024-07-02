@@ -1,0 +1,42 @@
+---
+- name: Create user and configure directory permissions
+  hosts: all
+  become: yes
+  tasks:
+    - name: Create the mgmtbld user with specific UID and GID
+      user:
+        name: mgmtbld
+        home: /home/mgmtbld
+        create_home: yes
+        uid: 1001
+        gid: 1001
+
+    - name: Ensure the mgmtbld group exists with specific GID
+      group:
+        name: mgmtbld
+        gid: 1001
+
+    - name: Create the /home/mgmtbld directory with appropriate permissions
+      file:
+        path: /home/mgmtbld
+        state: directory
+        owner: mgmtbld
+        group: mgmtbld
+        mode: '0777'
+
+    - name: Ensure the /home/mgmtbld directory is writable by anyone
+      acl:
+        path: /home/mgmtbld
+        recurse: yes
+        etype: default
+        permissions: 'rwx'
+        state: present
+        default: 'yes'
+
+    - name: List the contents of /home/mgmtbld
+      command: ls -ltr /home/mgmtbld
+      register: dir_listing
+
+    - name: Display the directory listing
+      debug:
+        var: dir_listing.stdout_lines
